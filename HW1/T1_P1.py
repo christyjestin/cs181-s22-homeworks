@@ -1,9 +1,3 @@
-#####################
-# CS 181, Spring 2022
-# Homework 1, Problem 1
-# STARTER CODE
-##################
-
 import numpy as np
 
 data = [(0., 0.),
@@ -14,10 +8,23 @@ data = [(0., 0.),
         (6., 1.5),
         (8., 0.5)]
 
-def compute_loss(tau):
-    # TODO
-    loss = 0
-    return loss
+def predict(x, y, tau, inputs, ignore_same = True):
+    output = np.ones(inputs.shape)
+    for i in range(output.shape[0]):
+        similarity = (x - np.repeat(inputs[i], x.shape[0])) ** 2
+        kernel = np.exp(-similarity / tau)
+        # we don't want to use y_i to predict yhat_i, so we'll ignore y_i if x* == x_i
+        if ignore_same:
+            kernel[similarity == 0] = 0
+        output[i] = kernel @ y
+    return output
 
-for tau in (0.01, 2, 100):
-    print("Loss for tau = " + str(tau) + ": " + str(compute_loss(tau)))
+def compute_loss(tau):
+    x = np.array([x for x,_ in data])
+    y = np.array([y for _,y in data])
+    error = predict(x, y, tau, x) - y
+    return np.sum(error ** 2)
+
+if __name__ == "__main__":
+    for tau in (0.01, 2, 100):
+        print("Loss for tau = " + str(tau) + ": " + str(compute_loss(tau)))
