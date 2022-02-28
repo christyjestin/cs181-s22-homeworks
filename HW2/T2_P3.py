@@ -1,6 +1,3 @@
-# Don't change these imports. Note that the last two are the
-# class implementations that you will implement in
-# T2_P3_LogisticRegression.py and T2_P3_GaussianGenerativeModel.py
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -10,17 +7,15 @@ from T2_P3_LogisticRegression import LogisticRegression
 from T2_P3_GaussianGenerativeModel import GaussianGenerativeModel
 from T2_P3_KNNModel import KNNModel
 
-
 # These are the hyperparameters to the classifiers. You may need to
 # adjust these as you try to find the best fit for each classifier.
 
 # Logistic Regression hyperparameters
-eta = 0.1 # Learning rate
-lam = 0.1 # Lambda for regularization
+eta = 0.001 # Learning rate
+lam = 0.001 # Lambda for regularization
 
 # Whether or not you want the plots to be displayed
 show_charts = True
-
 
 # DO NOT CHANGE ANYTHING BELOW THIS LINE!
 # -----------------------------------------------------------------
@@ -61,7 +56,7 @@ def visualize_boundary(model, X, y, title, width=2):
     plt.legend(handles=[red, blue, green])
 
     # Saving the image to a file, and showing it as well
-    plt.savefig(title + '.png')
+    plt.savefig('plots/' + title + '.png')
     if show_charts:
         plt.show()
 
@@ -82,19 +77,17 @@ y = np.array([star_labels[x] for x in df['Type']])
 nb1 = GaussianGenerativeModel(is_shared_covariance=False)
 nb1.fit(X, y)
 visualize_boundary(nb1, X, y, 'generative_result_separate_covariances')
-print('Separate Covariance negative log-likelihood: {}\n'
-      .format(nb1.negative_log_likelihood(X, y)))
+print(f'Separate Covariance negative log-likelihood: {nb1.negative_log_likelihood(X, y)}\n')
 
 nb2 = GaussianGenerativeModel(is_shared_covariance=True)
 nb2.fit(X, y)
 visualize_boundary(nb2, X, y, 'generative_result_shared_covariances')
-print('Shared Covariance negative log-likelihood: {}\n'
-      .format(nb2.negative_log_likelihood(X, y)))
+print(f'Shared Covariance negative log-likelihood: {nb2.negative_log_likelihood(X, y)}\n')
 
 lr = LogisticRegression(eta=eta, lam=lam)
 lr.fit(X, y)
-lr.visualize_loss('logistic_regression_loss', show_charts=show_charts)
-visualize_boundary(lr, X, y, 'logistic_regression_result')
+lr.visualize_loss(f'logistic_regression_loss_eta_{eta}_lam_{lam}', show_charts=show_charts)
+visualize_boundary(lr, X, y, f'logistic_regression_result_eta_{eta}_lam_{lam}')
 
 knn1 = KNNModel(k=1)
 knn1.fit(X, y)
@@ -120,19 +113,19 @@ y_knn5 = knn5.predict(X_test)
 
 # Predicting an unseen example
 print('Test star type predictions for Separate Covariance Gaussian Model:')
-print('magnitude 6 and temperature 2: {}\n'.format(y_nb1[0]))
+print(f'magnitude 6 and temperature 2: {y_nb1[0]}\n')
 
 print('Test star type predictions for Shared Covariance Gaussian Model:')
-print('magnitude 6 and temperature 2: {}\n'.format(y_nb2[0]))
+print(f'magnitude 6 and temperature 2: {y_nb2[0]}\n')
 
-print('Test star type predictions for Linear Regression:')
-print('magnitude 6 and temperature 2: {}'.format(y_lr[0]))
+print('Test star type predictions for Logistic Regression:')
+print(f'magnitude 6 and temperature 2: {y_lr[0]}')
 
 print('Test star type predictions for KNN Model with k=1:')
-print('magnitude 6 and temperature 2: {}'.format(y_knn1[0]))
+print(f'magnitude 6 and temperature 2: {y_knn1[0]}')
 
 print('Test star type predictions for KNN Model with k=3:')
-print('magnitude 6 and temperature 2: {}'.format(y_knn3[0]))
+print(f'magnitude 6 and temperature 2: {y_knn3[0]}')
 
 print('Test star type predictions for KNN Model with k=5:')
-print('magnitude 6 and temperature 2: {}'.format(y_knn5[0]))
+print(f'magnitude 6 and temperature 2: {y_knn5[0]}')

@@ -2,52 +2,42 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as c
 import matplotlib.patches as mpatches
-from scipy.special import expit as sigmoid
 
-# This script requires the above packages to be installed.
-# Please implement the basis2, basis3, fit, and predict methods.
-# Then, create the three plots. An example has been included below, although
-# the models will look funny until fit() and predict() are implemented!
-
-# You can add additional private methods by beginning them with two
-# underscores. It may look like the __dummyPrivateMethod below. You can feel
-# free to change any of the class attributes, as long as you do not change any
-# of the given function headers (they must take and return the same arguments).
-
-# Note: this is in Python 3
+def basis_generator(x, highest_power):
+    return np.stack([x ** i for i in range(highest_power + 1)], axis=1)
 
 def basis1(x):
-    return np.stack([np.ones(len(x)), x], axis=1)
+    return basis_generator(x, 1)
 
-# TODO: Implement this
 def basis2(x):
-    return None
+    return basis_generator(x, 2)
 
-# TODO: Implement this
 def basis3(x):
-    return None
+    return basis_generator(x, 5)
 
 class LogisticRegressor:
     def __init__(self, eta, runs):
-        # Your code here: initialize other variables here
         self.eta = eta
         self.runs = runs
 
-    # NOTE: Just to show how to make 'private' methods
-    def __dummyPrivateMethod(self, input):
-        return None
+    def __step(self, x, y):
+        z = np.dot(x, self.W)
+        gradient = -x * self.__sigmoid(z) * (y * (np.exp(-z) + 1) - 1)
+        self.W -= self.eta * np.mean(gradient, axis=0).reshape(self.W.shape)
 
-    # TODO: Optimize w using gradient descent
     def fit(self, x, y, w_init=None):
-        # Keep this if case for the autograder
         if w_init is not None:
             self.W = w_init
         else:
             self.W = np.random.rand(x.shape[1], 1)
+        for _ in range(self.runs):
+            self.__step(x, y)
 
-    # TODO: Fix this method!
+    def __sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+
     def predict(self, x):
-        return np.dot(x, self.W)
+        return self.__sigmoid(np.dot(x, self.W))
 
 # Function to visualize prediction lines
 # Takes as input last_x, last_y, [list of models], basis function, title
@@ -62,7 +52,7 @@ def visualize_prediction_lines(last_x, last_y, models, basis, title):
     plt.title(title)
     plt.xlabel('X Value')
     plt.ylabel('Y Label')
-    plt.axis([-3, 3, -.1, 1.1]) # Plot ranges
+    plt.axis([-3, 3, -0.1, 1.1]) # Plot ranges
 
     # Plot dataset that last model in models (models[-1]) was trained on
     cmap = c.ListedColormap(['r', 'b'])
@@ -89,7 +79,7 @@ def visualize_prediction_lines(last_x, last_y, models, basis, title):
     # Mean / expectation of learned models over all datasets
     plt.plot(X_pred, np.mean(Y_hats, axis=0), 'k', linewidth=5)
 
-    plt.savefig(title + '.png')
+    plt.savefig('plots/' + title + '.png')
     plt.show()
 
 # Function to generate datasets from underlying distribution
@@ -111,15 +101,15 @@ if __name__ == "__main__":
     runs = 10000
     N = 30
 
-    # TODO: Make plot for each basis with all 10 models on each plot
-
-    # For example:
-    all_models = []
-    for _ in range(10):
-        x, y = generate_data(N)
-        x_transformed = basis1(x)
-        model = LogisticRegressor(eta=eta, runs=runs)
-        model.fit(x_transformed, y)
-        all_models.append(model)
-    # Here x and y contain last dataset:
-    visualize_prediction_lines(x, y, all_models, basis1, "exampleplot")
+    basis_titles = ["Basis 1", "Basis 2", "Basis 3"]
+    bases = [basis1, basis2, basis3]
+    for i in range(3):
+        all_models = []
+        for _ in range(10):
+            x, y = generate_data(N)
+            x_transformed = bases[i](x)
+            model = LogisticRegressor(eta=eta, runs=runs)
+            model.fit(x_transformed, y)
+            all_models.append(model)
+        # Here x and y contain last dataset:
+        visualize_prediction_lines(x, y, all_models, bases[i], basis_titles[i])
