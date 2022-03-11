@@ -1,3 +1,5 @@
-
 *.pyc
 CS 181 Textbook.pdf
+.DS_Store
+.idea
+.vscode
