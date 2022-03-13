@@ -43,5 +43,5 @@ class GaussianGenerativeModel:
 
     def negative_log_likelihood(self, X, y):
         def log_likelihood(x, label):
-            return self.gaussians[label].logpdf(x) * np.log(self.pi[label])
+            return self.gaussians[label].logpdf(x) + np.log(self.pi[label])
         return -np.sum([log_likelihood(X[i], y[i]) for i in range(len(y))])
