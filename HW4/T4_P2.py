@@ -1,10 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
-import os
 from scipy.spatial.distance import cdist
 import seaborn
-os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
 
 # Loading datasets for K-Means and HAC
 small_dataset = np.load("data/small_dataset.npy")
