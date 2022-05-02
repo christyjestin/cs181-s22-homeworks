@@ -20,7 +20,7 @@ class Learner(object):
     This agent jumps randomly.
     """
 
-    def __init__(self, alpha=0.08, gamma=0.88, epsilon=0.00001):
+    def __init__(self, alpha=0.08, gamma=0.88, starting_epsilon=0.8, decay_rate=0.01):
         self.last_state = None
         self.last_action = None
         self.last_reward = None
@@ -28,7 +28,8 @@ class Learner(object):
         # Q learning parameters
         self.alpha = alpha
         self.gamma = gamma
-        self.epsilon = epsilon
+        self.curr_epsilon = starting_epsilon
+        self.decay_rate = decay_rate
         # We initialize our Q-value grid that has an entry for each action and state.
         # (action, rel_x, rel_y)
         self.Q = np.zeros((2, X_SCREEN // X_BINSIZE, Y_SCREEN // Y_BINSIZE))
@@ -69,9 +70,10 @@ class Learner(object):
         self.Q[a, old_x, old_y] = (1 - self.alpha) * q_val + self.alpha * (r + self.gamma * best_q)
 
         rand_move = int(npr.rand() < 0.5)
-        new_action = np.argmax(self.Q[:, curr_x, curr_y]) if npr.rand() > self.epsilon else rand_move
+        new_action = np.argmax(self.Q[:, curr_x, curr_y]) if npr.rand() > self.curr_epsilon else rand_move
         self.last_action = new_action
         self.last_state = s
+        self.curr_epsilon *= self.decay_rate
         return self.last_action
 
     def reward_callback(self, reward):
